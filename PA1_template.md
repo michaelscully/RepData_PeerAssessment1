@@ -9,11 +9,36 @@ output:
   
 ## Loading and preprocessing the data
 
-```{r echo=TRUE}
+
+```r
   # load packages
   required.libraries <- c('ggplot2', 'dplyr', 'knitr', 'markdown')
   lapply(required.libraries, library, character.only=T)
-  
+```
+
+```
+## [[1]]
+##  [1] "markdown"  "knitr"     "ggplot2"   "dplyr"     "stats"    
+##  [6] "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+## [11] "base"     
+## 
+## [[2]]
+##  [1] "markdown"  "knitr"     "ggplot2"   "dplyr"     "stats"    
+##  [6] "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+## [11] "base"     
+## 
+## [[3]]
+##  [1] "markdown"  "knitr"     "ggplot2"   "dplyr"     "stats"    
+##  [6] "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+## [11] "base"     
+## 
+## [[4]]
+##  [1] "markdown"  "knitr"     "ggplot2"   "dplyr"     "stats"    
+##  [6] "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+## [11] "base"
+```
+
+```r
   # load data
   activity.file <- "activity" #without extension
   unzip(paste(activity.file, ".zip", sep=""))
@@ -22,31 +47,39 @@ output:
   # total steps by date
   activity.data.by.date <- group_by(activity.data, date)
   summary.data.by.date <- summarise(activity.data.by.date, total.steps=sum(steps, na.rm = TRUE))
-
 ```
 
 *******
     
 ## What is mean total number of steps taken per day?
   
-```{r echo=TRUE}
+
+```r
   # plot total steps per day
   ggplot(data=summary.data.by.date, aes(summary.data.by.date$total.steps)) + geom_histogram()
+```
 
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
+```r
   # calculate mean and median steps
   mean.steps = mean(summary.data.by.date$total.steps)
   median.steps = median(summary.data.by.date$total.steps)
-
 ```
     
       
-The mean steps taken per day is **`r mean.steps`**, and the median is **`r median.steps`**.
+The mean steps taken per day is **9354.2295082**, and the median is **10395**.
      
 *******
 
 ## What is the average daily activity pattern?
   
-```{r echo=TRUE}
+
+```r
   # group by interval
   activity.data.by.interval <- group_by(activity.data, interval)
   summary.data.by.interval <- summarise(activity.data.by.interval, average.steps=mean(steps, na.rm = TRUE))
@@ -54,31 +87,36 @@ The mean steps taken per day is **`r mean.steps`**, and the median is **`r media
   # plot average steps per interval
   plot(summary.data.by.interval$interval, summary.data.by.interval$average.steps, 
        ylab ="Average Steps", xlab="Interval", type="l")
-  
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
+
+```r
   #find max interval
   interval = which.max(summary.data.by.interval$average.steps)
   max.steps = summary.data.by.interval$interval[interval]
 ```
      
        
-The interval with the maximum average steps is **`r interval`** with **`r max.steps`** steps on average.
+The interval with the maximum average steps is **104** with **835** steps on average.
  
 *******
     
 ## Imputing missing values
 
-```{r echo=TRUE}
+
+```r
   # count na rows
   na.count <- sum(is.na(activity.data$steps))
 ```
     
     
-There are **`r na.count`** records with NA steps recorded.      
+There are **2304** records with NA steps recorded.      
     
    
 Replace NA values for *steps* with average for that interval across the month (imputed value).
-```{r echo=TRUE}
-  
+
+```r
   # copy data frame to new data frame
   activity.data.imputed <- activity.data
   
@@ -98,15 +136,22 @@ Replace NA values for *steps* with average for that interval across the month (i
 
   # plot total steps per day (with imputed values)
   ggplot(data=summary.data.by.date.imputed, aes(summary.data.by.date.imputed$total.steps)) + geom_histogram()
+```
 
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
+```r
   # calculate mean and median steps
   mean.steps.imputed = mean(summary.data.by.date.imputed$total.steps)
   median.steps.imputed = median(summary.data.by.date.imputed$total.steps)
-
 ```
   
   
-When including imputed values, the mean steps taken per day is **`r mean.steps.imputed`**, and the median is **`r median.steps.imputed`**.  Both the mean and median are **higher** when the imputed values are included.
+When including imputed values, the mean steps taken per day is **1.074977 &times; 10<sup>4</sup>**, and the median is **10641**.  Both the mean and median are **higher** when the imputed values are included.
 
 *******
     
@@ -114,8 +159,8 @@ When including imputed values, the mean steps taken per day is **`r mean.steps.i
 
 *ASSUMPTION:* Using the activity data that *includes* the imputed data from the previous question to complete this part of the assignment.
 
-```{r echo=TRUE}
 
+```r
   # Add column and label for weekdays
   activity.data.imputed$day.type[which(weekdays(as.Date(activity.data.imputed$date)) 
     %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))] <- "weekday" 
@@ -145,6 +190,7 @@ When including imputed values, the mean steps taken per day is **`r mean.steps.i
 
   mtext("interval", side = 1, outer = TRUE, cex = 0.7, line = 2.2)
   mtext("average steps", side = 2, outer = TRUE, cex = 0.7, line = 2.2)
-
 ```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
